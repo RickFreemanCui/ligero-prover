@@ -46,7 +46,10 @@ value_kind transpile_wabt_type(const wabt::Type& type) {
         return value_kind::f32;
     case wabt::Type::Enum::F64:
         return value_kind::f64;
+    case wabt::Type::Enum::Ref:
+    case wabt::Type::Enum::RefNull:
     case wabt::Type::Reference:
+    case wabt::Type::ExnRef:
         return value_kind::reference;
     case wabt::Type::FuncRef:
         return value_kind::funcref;
@@ -55,6 +58,10 @@ value_kind transpile_wabt_type(const wabt::Type& type) {
     default:
         return value_kind::unit;
     }
+}
+
+value_kind transpile_wabt_type(const wabt::Var& var) {
+    return transpile_wabt_type(var.to_type());
 }
 
 // ------------------------------------------------------------

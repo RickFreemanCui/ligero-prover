@@ -36,19 +36,23 @@ WGPUShaderModule load_shader(WGPUDevice device, const fs::path& path) {
     ss << ifs.rdbuf();
     std::string source = ss.str();
 
+#if defined(WGPUSType_ShaderModuleWGSLDescriptor)
     WGPUShaderModuleWGSLDescriptor wgslDesc {
         .chain = WGPUChainedStruct {
             .next = nullptr,
-#if defined(__EMSCRIPTEN__)
             .sType = WGPUSType_ShaderModuleWGSLDescriptor,
-#else
-            // use Dawn's type
-            .sType = WGPUSType_ShaderSourceWGSL,
-#endif
-
         },
         .code = WGPU_STRING(source.c_str())
     };
+#else
+    WGPUShaderSourceWGSL wgslDesc {
+        .chain = WGPUChainedStruct {
+            .next = nullptr,
+            .sType = WGPUSType_ShaderSourceWGSL,
+        },
+        .code = WGPU_STRING(source.c_str())
+    };
+#endif
 
     WGPUShaderModuleDescriptor desc {
         .nextInChain = (WGPUChainedStruct*)&wgslDesc,
@@ -61,5 +65,4 @@ WGPUShaderModule load_shader(WGPUDevice device, const fs::path& path) {
 
 }  // namespace webgpu
 }  // namespace ligero
-
 

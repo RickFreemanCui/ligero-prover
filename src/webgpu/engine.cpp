@@ -1584,17 +1584,23 @@ void webgpu_context::sha256_init(size_t sha_instances) {
                    placeholder.size(),
                    std::to_string(sha_instances));
 
+#if defined(WGPUSType_ShaderModuleWGSLDescriptor)
     WGPUShaderModuleWGSLDescriptor wgslDesc {
         .chain = WGPUChainedStruct {
             .next = nullptr,
-#if defined(__EMSCRIPTEN__)
             .sType = WGPUSType_ShaderModuleWGSLDescriptor,
-#else
-            .sType = WGPUSType_ShaderSourceWGSL,
-#endif
         },
         .code = WGPU_STRING(source.c_str())
     };
+#else
+    WGPUShaderSourceWGSL wgslDesc {
+        .chain = WGPUChainedStruct {
+            .next = nullptr,
+            .sType = WGPUSType_ShaderSourceWGSL,
+        },
+        .code = WGPU_STRING(source.c_str())
+    };
+#endif
 
     WGPUShaderModuleDescriptor desc {
         .nextInChain = (WGPUChainedStruct*)&wgslDesc,

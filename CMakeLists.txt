@@ -6,6 +6,14 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 set(CMAKE_CXX_STANDARD 20)
 
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  # Boost.MPL triggers -Wenum-constexpr-conversion with Clang 17.
+  add_compile_options(-Wno-enum-constexpr-conversion -Wno-deprecated-builtins)
+endif()
+
+# libc++ (C++20) removed std::unary_function; tell Boost to avoid it.
+add_compile_definitions(BOOST_NO_CXX98_FUNCTION_BASE)
+
 include(FetchContent)
 
 FetchContent_Declare(
